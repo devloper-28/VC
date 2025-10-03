@@ -94,32 +94,42 @@ export class WebRTCService {
   }
 
   async createAnswer(offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
-    if (!this.peerConnection || !this.localStream) {
-      throw new Error('Peer connection or local stream not initialized');
+    try {
+      if (!this.peerConnection || !this.localStream) {
+        throw new Error('Peer connection or local stream not initialized');
+      }
+
+      // Add local stream to peer connection
+      this.localStream.getTracks().forEach(track => {
+        this.peerConnection!.addTrack(track, this.localStream!);
+      });
+
+      console.log('Setting remote description (offer)...');
+      await this.peerConnection.setRemoteDescription(offer);
+      console.log('Creating answer...');
+      const answer = await this.peerConnection.createAnswer();
+      console.log('Setting local description (answer)...');
+      await this.peerConnection.setLocalDescription(answer);
+      console.log('Answer created successfully');
+      return answer;
+    } catch (error) {
+      console.error('Error creating WebRTC answer:', error);
+      throw error;
     }
-
-    // Add local stream to peer connection
-    this.localStream.getTracks().forEach(track => {
-      this.peerConnection!.addTrack(track, this.localStream!);
-    });
-
-    console.log('Setting remote description (offer)...');
-    await this.peerConnection.setRemoteDescription(offer);
-    console.log('Creating answer...');
-    const answer = await this.peerConnection.createAnswer();
-    console.log('Setting local description (answer)...');
-    await this.peerConnection.setLocalDescription(answer);
-    console.log('Answer created successfully');
-    return answer;
   }
 
   async handleAnswer(answer: RTCSessionDescriptionInit) {
-    if (!this.peerConnection) {
-      throw new Error('Peer connection not initialized');
+    try {
+      if (!this.peerConnection) {
+        throw new Error('Peer connection not initialized');
+      }
+      console.log('Setting remote description (answer)...');
+      await this.peerConnection.setRemoteDescription(answer);
+      console.log('Answer set successfully');
+    } catch (error) {
+      console.error('Error handling WebRTC answer:', error);
+      throw error;
     }
-    console.log('Setting remote description (answer)...');
-    await this.peerConnection.setRemoteDescription(answer);
-    console.log('Answer set successfully');
   }
 
   async handleIceCandidate(candidate: RTCIceCandidateInit) {

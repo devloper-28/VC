@@ -51,6 +51,10 @@ export class WebRTCService {
     // Handle ICE connection state changes
     this.peerConnection.oniceconnectionstatechange = () => {
       console.log('ICE connection state:', this.peerConnection?.iceConnectionState);
+      if (this.peerConnection?.iceConnectionState === 'connected' || 
+          this.peerConnection?.iceConnectionState === 'completed') {
+        console.log('ICE connection established!');
+      }
     };
 
     // Handle ICE gathering state changes
@@ -99,9 +103,13 @@ export class WebRTCService {
       this.peerConnection!.addTrack(track, this.localStream!);
     });
 
+    console.log('Setting remote description (offer)...');
     await this.peerConnection.setRemoteDescription(offer);
+    console.log('Creating answer...');
     const answer = await this.peerConnection.createAnswer();
+    console.log('Setting local description (answer)...');
     await this.peerConnection.setLocalDescription(answer);
+    console.log('Answer created successfully');
     return answer;
   }
 
@@ -109,7 +117,9 @@ export class WebRTCService {
     if (!this.peerConnection) {
       throw new Error('Peer connection not initialized');
     }
+    console.log('Setting remote description (answer)...');
     await this.peerConnection.setRemoteDescription(answer);
+    console.log('Answer set successfully');
   }
 
   async handleIceCandidate(candidate: RTCIceCandidateInit) {
@@ -125,6 +135,15 @@ export class WebRTCService {
 
   getLocalStream(): MediaStream | null {
     return this.localStream;
+  }
+
+  // Method to manually check for remote stream
+  checkForRemoteStream(): MediaStream | null {
+    if (this.remoteStream) {
+      console.log('Remote stream found via check:', this.remoteStream);
+      return this.remoteStream;
+    }
+    return null;
   }
 
   stop() {

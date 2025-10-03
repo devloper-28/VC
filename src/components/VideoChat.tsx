@@ -155,12 +155,25 @@ export function VideoChat() {
         
         // Check for remote stream after answer is handled
         setTimeout(() => {
-          const remoteStream = webrtcService.current?.getRemoteStream();
+          const remoteStream = webrtcService.current?.checkForRemoteStream();
           console.log('Remote stream after answer:', remoteStream);
           if (remoteStream) {
             setRemoteStream(remoteStream);
           }
         }, 1000);
+        
+        // Also check periodically for remote stream
+        const checkInterval = setInterval(() => {
+          const remoteStream = webrtcService.current?.checkForRemoteStream();
+          if (remoteStream) {
+            console.log('Remote stream found via periodic check:', remoteStream);
+            setRemoteStream(remoteStream);
+            clearInterval(checkInterval);
+          }
+        }, 500);
+        
+        // Clear interval after 10 seconds
+        setTimeout(() => clearInterval(checkInterval), 10000);
       } catch (error) {
         console.error('Error handling answer:', error);
       }

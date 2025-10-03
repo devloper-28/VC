@@ -54,7 +54,7 @@ export function VideoChat() {
           if (webrtcService.current) {
             const remoteStream = webrtcService.current.getRemoteStream();
             if (remoteStream) {
-              console.log('Remote stream found!');
+              console.log('Remote stream found!', remoteStream);
               setRemoteStream(remoteStream);
             } else {
               setTimeout(checkRemoteStream, 100);
@@ -62,6 +62,17 @@ export function VideoChat() {
           }
         };
         checkRemoteStream();
+        
+        // Also listen for the custom event
+        const handleRemoteStreamReceived = (event: any) => {
+          console.log('Remote stream received via event:', event.detail.stream);
+          setRemoteStream(event.detail.stream);
+        };
+        window.addEventListener('remoteStreamReceived', handleRemoteStreamReceived);
+        
+        return () => {
+          window.removeEventListener('remoteStreamReceived', handleRemoteStreamReceived);
+        };
       } catch (error) {
         console.error('Error starting video:', error);
       }

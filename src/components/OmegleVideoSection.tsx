@@ -21,12 +21,20 @@ export function OmegleVideoSection({
   const [cameraError, setCameraError] = useState(false);
 
   useEffect(() => {
+    console.log('OmegleVideoSection useEffect:', { 
+      label, 
+      isLocalVideo, 
+      hasStream: !!stream, 
+      streamId: stream?.id 
+    });
+    
     // Use provided stream or get local stream
     if (stream) {
+      console.log('Setting stream for video:', stream);
       setLocalStream(stream);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        videoRef.current.play().catch(e => console.log('Video play error:', e));
       }
     } else if (isLocalVideo) {
       console.log('Requesting camera access for local video...');
@@ -163,9 +171,17 @@ export function OmegleVideoSection({
                 If permission dialog doesn't appear, check your browser settings
               </p>
             </div>
+          ) : isConnected && stream ? (
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted={isLocalVideo}
+              className="w-full h-full object-cover"
+            />
           ) : isConnected ? (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
-              <p className="text-white text-sm">Stranger's video</p>
+              <p className="text-white text-sm">Waiting for stranger's video...</p>
             </div>
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-800">

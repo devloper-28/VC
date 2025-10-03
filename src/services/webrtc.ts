@@ -21,8 +21,13 @@ export class WebRTCService {
 
     // Handle remote stream
     this.peerConnection.ontrack = (event) => {
-      console.log('Received remote stream');
+      console.log('Received remote stream:', event.streams[0]);
       this.remoteStream = event.streams[0];
+      
+      // Trigger a custom event to notify components
+      window.dispatchEvent(new CustomEvent('remoteStreamReceived', { 
+        detail: { stream: event.streams[0] } 
+      }));
     };
 
     // Handle ICE candidates

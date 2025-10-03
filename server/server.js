@@ -24,7 +24,14 @@ app.use(express.json());
 
 // Health check endpoint
 app.get('/', (req, res) => {
-  res.json({ status: 'Server is running', port: PORT });
+  console.log('Health check requested');
+  res.json({ status: 'Server is running', port: PORT, timestamp: new Date().toISOString() });
+});
+
+// Additional health check endpoint
+app.get('/health', (req, res) => {
+  console.log('Health check requested at /health');
+  res.json({ status: 'OK', port: PORT, timestamp: new Date().toISOString() });
 });
 
 // Store waiting users and active rooms

@@ -42,7 +42,20 @@ export class WebRTCService {
 
     // Handle connection state changes
     this.peerConnection.onconnectionstatechange = () => {
-      console.log('Connection state:', this.peerConnection?.connectionState);
+      console.log('WebRTC Connection state:', this.peerConnection?.connectionState);
+      if (this.peerConnection?.connectionState === 'connected') {
+        console.log('WebRTC connection established!');
+      }
+    };
+
+    // Handle ICE connection state changes
+    this.peerConnection.oniceconnectionstatechange = () => {
+      console.log('ICE connection state:', this.peerConnection?.iceConnectionState);
+    };
+
+    // Handle ICE gathering state changes
+    this.peerConnection.onicegatheringstatechange = () => {
+      console.log('ICE gathering state:', this.peerConnection?.iceGatheringState);
     };
   }
 

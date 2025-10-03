@@ -136,6 +136,7 @@ export function VideoChat() {
         const answer = await webrtcService.current.createAnswer(data.offer);
         console.log('Sending WebRTC answer:', answer);
         socketService.current!.sendWebRTCAnswer(answer);
+        console.log('WebRTC answer sent successfully');
       } catch (error) {
         console.error('Error handling offer:', error);
       }
@@ -151,6 +152,15 @@ export function VideoChat() {
         console.log('Handling WebRTC answer...');
         await webrtcService.current.handleAnswer(data.answer);
         console.log('WebRTC answer handled successfully');
+        
+        // Check for remote stream after answer is handled
+        setTimeout(() => {
+          const remoteStream = webrtcService.current?.getRemoteStream();
+          console.log('Remote stream after answer:', remoteStream);
+          if (remoteStream) {
+            setRemoteStream(remoteStream);
+          }
+        }, 1000);
       } catch (error) {
         console.error('Error handling answer:', error);
       }

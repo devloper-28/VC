@@ -8,16 +8,15 @@ export class SocketService {
     // Use environment variable for socket URL, fallback to localhost for development
     let socketUrl = import.meta.env.VITE_SOCKET_URL;
     
-    if (!socketUrl) {
-      if (window.location.hostname === 'localhost') {
-        socketUrl = 'ws://localhost:3001';
-      } else {
-        // For production without env var, use the Railway backend
-        socketUrl = 'wss://vc-production-d0d3.up.railway.app';
-      }
+    // Force production URL for now to fix mixed content issue
+    if (window.location.hostname !== 'localhost') {
+      socketUrl = 'wss://vc-production-d0d3.up.railway.app';
+    } else if (!socketUrl) {
+      socketUrl = 'ws://localhost:3001';
     }
     
     console.log('Environment VITE_SOCKET_URL:', import.meta.env.VITE_SOCKET_URL);
+    console.log('Hostname:', window.location.hostname);
     console.log('Connecting to socket server:', socketUrl);
     
     this.socket = io(socketUrl, {
